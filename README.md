@@ -1,7 +1,6 @@
-## uv -- Finding prophage regions in bacterial genomes using brute force
 
 <p align="center">
-  <img src="./img/logo.jpg" width="150">
+  <img src="./img/logo.jpg" width="200">
 </p>
 
 `uv` is a small workflow to reliably identify prophages in bacterial genomes. Of course, this is an old problem, but `uv` differs in two regards:
