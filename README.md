@@ -23,7 +23,8 @@ WD=/some/directory
 cp get_db.sh $WD && cd $WD && sh get_db.sh
 # Turn on the UV light
 nextflow run /path/to/uv/main.nf --results results --db db --genomes metadata.csv --annotate true
-# Add eg --maxram 8 to limit RAM usage, defaults to 8 GB
+# Add --maxram 8 to limit RAM usage, defaults to 8 GB
+# Add -resume (with a single "-"!) to rerun workflow with cached results
 ```
 
 
