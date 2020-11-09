@@ -1,7 +1,7 @@
-
 <p align="center">
   <img src="./img/logo.jpg" width="200">
 </p>
+
 
 `uv` is a small workflow to reliably identify prophages in bacterial genomes. Of course, this is an old problem, but `uv` differs in two regards:
 
@@ -33,4 +33,12 @@ In the lab, temperate phages (intact prophages) can be induced with UV light, wh
 
 ### Details
 
-`uv` needs a metadata file with two columns, "name" and "path". "name" will appear in the results folder for each bacterium screened. The reason to add this explicit identifier "name" is that humans have just come up with way too many ways to name files, so any parser will break for some people.
+`uv` needs a metadata file with two columns, "name" and "path". "name" is a unique identifier, and "path" is the absolute path to your genome assembly:
+
+```csv
+name,path
+foo,/path/to/genome_1.fasta
+bar,/path/to/genome_2.fasta
+```
+
+"name" will appear in the results folder for each bacterium screened. The reason to add this explicit identifier "name" is that humans have just come up with way too many ways to name files, so any parser will break for some people.
