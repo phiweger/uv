@@ -19,7 +19,8 @@ process reading_frames {
 
 
 process search_protein_db {
-    memory '8 GB'  // limits number of instances run in parallel
+    memory "${params.maxram} GB"  
+    // Limits number of instances run in parallel
 
     input:
     tuple(val(name), path(genome), path(proteins))

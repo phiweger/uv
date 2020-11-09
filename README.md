@@ -18,11 +18,11 @@ git clone https://github.com/phiweger/uv
 # Set up environment
 conda env create -f uv/env.yml && conda activate uv
 # Choose a working directoy
-$WD=/some/directory
+WD=/some/directory
 # Get databases and test data -- you need about 24 GB disk space
 cp get_db.sh $WD && cd $WD && sh get_db.sh
 # Turn on the UV light
-nextflow run /path/to/uv/main.nf --results results --db db --genomes metadata.csv --annotate true
+nextflow run /path/to/uv/main.nf --results results --db db --genomes metadata.csv --annotate true --maxram 8
 ```
 
 
