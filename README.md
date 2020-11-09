@@ -14,7 +14,7 @@
 
 ```bash
 # Get code
-git clone https://github.com/phiweger/uv.git
+git clone https://github.com/phiweger/uv
 # Set up environment
 conda env create -f uv/env.yml && conda activate uv
 # Choose a working directoy
