@@ -29,3 +29,8 @@ nextflow run /path/to/uv/main.nf --results results --db db --genomes metadata.cs
 ### Why "uv"?
 
 In the lab, temperate phages (intact prophages) can be induced with UV light, which makes them leave their host's genome and enter in a lytic life cycle. And just as this uncovers (pro)phages using brute physical force, `uv` uncovers them using brute data force.
+
+
+### Details
+
+`uv` needs a metadata file with two columns, "name" and "path". "name" will appear in the results folder for each bacterium screened. The reason to add this explicit identifier "name" is that humans have just come up with way too many ways to name files, so any parser will break for some people.
