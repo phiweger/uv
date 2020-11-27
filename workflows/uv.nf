@@ -1,3 +1,12 @@
+// Param "path_bin_<name>" has to be unique across the composite workflow!
+// This block needs to come before include {...}
+if (params.standalone) {
+    params.path_bin_uv  = "${workflow.projectDir}/bin"
+} else {
+    params.path_bin_uv  = "${workflow.projectDir}/submodules/uv/bin"
+}
+
+
 include { 
     reading_frames
     search_protein_db
