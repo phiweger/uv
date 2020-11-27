@@ -11,7 +11,7 @@ process phage_containment {
     path('phage_search.containment.csv')
 
     """
-    phage_containment.py \
+    ${workflow.projectDir}/bin/phage_containment.py \
         --query-sketches ${query_sketches} \
         --phage-sketches ${phage_sketches} \
         --tree ${tree} \

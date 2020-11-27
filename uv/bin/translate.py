@@ -22,7 +22,7 @@ def translate(nt):
     result = []
     for i in range(0, len(nt), 3):
         codon = codons[nt[i:i+3]]
-        print(codon)
+        # print(codon)
         if codon != '*':    
             result.append(codon)
         else:

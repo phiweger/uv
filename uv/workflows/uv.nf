@@ -19,9 +19,14 @@ workflow uv {
 
     main:
     // Housekeeping
-    db_proteins = channel.fromPath("${params.db}/phage_proteins/targetDB*")
     prefix = 'targetDB'
-    checkv_db = channel.fromPath("${params.db}/checkv")
+    db_proteins = channel.fromPath(
+        "${params.uvdb}/phage_proteins/targetDB*",
+        checkIfExists: true)
+    
+    checkv_db = channel.fromPath(
+        "${params.uvdb}/checkv",
+        checkIfExists: true)
 
     // Action
     rename_contigs(minlen(genome))
@@ -54,8 +59,12 @@ workflow annotate {
     names
 
     main:
-    hmms = channel.fromPath("${params.db}/pvog.hmm")
-    hmm_groups = channel.fromPath("${params.db}/pvog.groups.csv")
+    hmms = channel.fromPath(
+        "${params.uvdb}/pvog.hmm",
+        checkIfExists: true)
+    hmm_groups = channel.fromPath(
+        "${params.uvdb}/pvog.groups.csv",
+        checkIfExists: true)
 
     // Reannotate reading frames using phage-specific ORF caller ...
     careful_frames(fragment)

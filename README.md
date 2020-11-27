@@ -22,7 +22,7 @@ WD=/some/directory
 # Get databases and test data -- you need about 24 GB disk space
 cp get_db.sh $WD && cd $WD && sh get_db.sh
 # Turn on the UV light
-nextflow run /path/to/uv/main.nf --results results --db db --genomes metadata.csv --annotate true
+nextflow run /path/to/uv/main.nf --results results --uvdb db --genomes metadata.csv --annotate true
 # Add --maxram 8 to limit RAM usage, defaults to 8 GB
 # Add -resume (with a single "-"!) to rerun workflow with cached results
 ```

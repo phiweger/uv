@@ -46,7 +46,7 @@ process intervals {
     tuple(val(name), path("putative.bed"), emit: mask)
 
     """
-    find_phage_breakpoints.py --genome ${genome} --frames ${proteins} --hits ${hits} --threshold 1 --names ${names} --outdir results
+    ${workflow.projectDir}/bin/find_phage_breakpoints.py --genome ${genome} --frames ${proteins} --hits ${hits} --threshold 1 --names ${names} --outdir results
 
     cat results/*.bed > tmp
     bedtools sort -i tmp > putative.bed
@@ -75,7 +75,7 @@ process careful_frames {
     phanotate.py --outfmt fasta ${genome} > frames.fna
     map_into_global_coordinates.py -i frames.fna -o frames.recoord.fna
 
-    translate.py -i frames.recoord.fna -o frames.faa
+    ${workflow.projectDir}/bin/translate.py -i frames.recoord.fna -o frames.faa
     """
     // pip3 install phanotate
     // conda install -y -c bioconda trnascan-se
@@ -134,7 +134,7 @@ process filter_qc {
     cat qc/*.fna > all 2> /dev/null
     
     if [ -s all ]; then 
-        filter_checkv.py \
+        ${workflow.projectDir}/bin/filter_checkv.py \
             --id ${name} \
             --qc-results qc \
             --min-viral-genes ${params.min_viral_genes} \
@@ -179,7 +179,7 @@ process interpret_hmms {
 
     shell:
     '''
-    lookup_hmms.py --hits !{hits} --groups !{groups} -o tmp
+    !{workflow.projectDir}/bin/lookup_hmms.py --hits !{hits} --groups !{groups} -o tmp
     # we need a unique name
     checksum=$(md5sum tmp | awk '{ printf $1 }')
     mv tmp ${checksum}.bed
@@ -199,7 +199,7 @@ process collect_hmms {
     """
     cat *.bed > all
     bedtools sort -i all > sorted
-    deduplicate_and_rename.py -i sorted -o annotation.bed --names ${names}
+    ${workflow.projectDir}/bin/deduplicate_and_rename.py -i sorted -o annotation.bed --names ${names}
     """
 }
 
@@ -213,7 +213,7 @@ process minlen {
 
     script:
     """
-    minlen.py -i ${genome} -o reference.fasta --minlen ${params.min_contig_len}
+    ${workflow.projectDir}/bin/minlen.py -i ${genome} -o reference.fasta --minlen ${params.min_contig_len}
     """
 }
 
@@ -230,7 +230,7 @@ process rename_contigs {
     tuple(val(name), path("${name}.contig_names.txt"), emit: names)
 
     """
-    rename.py -i ${genome} \
+    ${workflow.projectDir}/bin/rename.py -i ${genome} \
         --sequences ${name}.renamed_contigs.fasta \
         --names ${name}.contig_names.txt
     """
