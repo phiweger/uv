@@ -24,6 +24,10 @@ args = parser.parse_args()
 
 
 def recoord(header):
+    # >7818d5b6a2009fdad00e4c146182732a:86920-128097.1442 [START=237]
+    # Here, 1442 ist stop, 237 is start, in the tabular output it looks like:
+    # #START  STOP    FRAME   CONTIG  SCORE
+    # 237     1442    +       7818d5b6a2009fdad00e4c146182732a:86920-128097 ...
     a, b, _ = header.split(' ')
     contig, start, end, j = re.sub(':|-|\.', ',', a).split(',')
     start, end, j = [int(i) for i in [start, end, j ]]

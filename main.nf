@@ -2,6 +2,9 @@ nextflow.enable.dsl = 2
 
 
 include { uv; annotate } from './workflows/uv.nf'
+// include { crispr } from './workflows/crispr.nf'
+// include { setup } from './workflows/setup.nf'
+// include { search } from './workflows/search.nf'
 
 
 workflow {
@@ -26,13 +29,26 @@ workflow {
                      .splitCsv(header: true)
                      .map{ row -> tuple(row.name, row.path) }
 
+    // phages = channel.fromPath(params.phages)
+    // setup(phages)
+
+    //sigs = channel.fromPath(params.signatures)
+
     // Find prophages
     uv(genomes)
+    // prophages = uv.out.sequences.transpose().combine(setup.out.hash_ix)
+    //prophages = uv.out.sequences.transpose().combine(sigs)
 
     // Annotate them carefully
     if (params.annotate) {
         annotate(uv.out.sequences.transpose(), uv.out.names)
     }
+
+    //crispr(genomes).view()
+    // phage_fragments = crispr.out.combine(setup.out.kmer_ix)
+
+    // search(prophages, crispr.out)
+    // search(prophages)
 }
 
 

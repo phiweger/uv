@@ -28,28 +28,79 @@ process search_protein_db {
     val(prefix)
 
     output:
-    tuple(val(name), path(genome), path(proteins), path('aln.m8'))
+    tuple(val(name), path(genome), path(proteins), path('aln.m8')) optional true
 
     """
     mmseqs easy-search --min-seq-id 0.95 -c 0.95 ${proteins} ${prefix} aln.m8 tmp
+    # If the file is empty, remove it
+    [[ -s aln.m8 ]] || rm aln.m8
     """
 }
 
 
-process intervals {
+process search_protein_db_careful {
+    memory "${params.maxram} GB"  
+    // Limits number of instances run in parallel
+
+    input:
+    path('frames?.faa')
+    // ? allows collecting multiples files with the same name in a single channel.
+    // https://github.com/nextflow-io/nextflow/issues/1779
+    path(db)
+    val(prefix)
+
+    output:
+    path('aln.m8') optional true
+
+    """
+    cat frames* > frames.faa
+    mmseqs easy-search --max-accept 1 --min-seq-id 0.3 -c 0.5 frames.faa ${prefix} aln.m8 tmp
+    [[ -s aln.m8 ]] || rm aln.m8
+    """
+}
+
+
+process search_tails {
+    publishDir "${params.results}/${name}", mode: 'copy', overwrite: true
+    memory "${params.maxram} GB"  
+    // Limits number of instances run in parallel
+
+    input:
+    tuple val(name), path('frames?.faa'), path(db)
+    
+    // ? allows collecting multiples files with the same name in a single channel.
+    // https://github.com/nextflow-io/nextflow/issues/1779
+
+    output:
+    path('aln.m8') optional true
+
+    """
+    cat frames* > frames.faa
+    mmseqs easy-search --max-accept 1 --min-seq-id 0.3 -c 0.5 frames.faa ${db} aln.m8 tmp
+    [[ -s aln.m8 ]] || rm aln.m8
+    """
+}
+
+
+process segment {
+    errorStrategy 'ignore'
     publishDir "${params.results}/${name}", mode: 'copy', overwrite: true, pattern: '*.bed'
+
     input:
     tuple(val(name), path(genome), path(proteins), path(hits), path(names))
 
     output:
-    tuple(val(name), path("results/*.fasta"), emit: sequences)
-    tuple(val(name), path("putative.bed"), emit: mask)
+    tuple(val(name), path("results/*.fasta"), emit: sequences) optional true
+    tuple(val(name), path("putative.bed"), emit: mask) optional true
 
     """
     ${params.path_bin_uv}/find_phage_breakpoints.py --genome ${genome} --frames ${proteins} --hits ${hits} --threshold 1 --names ${names} --outdir results
 
-    cat results/*.bed > tmp
-    bedtools sort -i tmp > putative.bed
+    if [[ -s results/*.bed ]]
+    then
+        cat results/*.bed > tmp
+        bedtools sort -i tmp > putative.bed
+    fi
     """
 }
 
@@ -63,6 +114,7 @@ process careful_frames {
     The translation to aa does not bother correcting this, bc/ it should not
     make a huge difference to subsequent HMM domain search.
     */
+    publishDir "${params.results}/${name}", mode: 'copy', overwrite: true
     errorStrategy 'ignore'  // if eg N in sequence
 
     input:
@@ -73,8 +125,9 @@ process careful_frames {
 
     """
     phanotate.py --outfmt fasta ${genome} > frames.fna
-    map_into_global_coordinates.py -i frames.fna -o frames.recoord.fna
-
+    phanotate.py --outfmt tabular ${genome} > frames.tsv
+    
+    ${params.path_bin_uv}/map_into_global_coordinates.py -i frames.fna -o frames.recoord.fna
     ${params.path_bin_uv}/translate.py -i frames.recoord.fna -o frames.faa
     """
     // pip3 install phanotate
@@ -123,7 +176,7 @@ process filter_qc {
         optional true
     tuple(val(name), path('phages.bed'), emit: mask) \
         optional true
-    tuple(val(name), path('contigs.txt'), emit: positive) \
+    tuple(val(name), path('contigs_with_phages.csv'), emit: positive) \
         optional true
 
     """
@@ -144,7 +197,7 @@ process filter_qc {
             --outdir sequences --force
 
         mv sequences/phages.bed phages.bed
-        cut -f1 phages.bed | sort | uniq > contigs.txt
+        cut -f1 phages.bed | sort | uniq > contigs_with_phages.csv
     fi
     """
 }
